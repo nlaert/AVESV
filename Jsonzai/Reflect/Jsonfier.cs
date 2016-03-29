@@ -9,8 +9,11 @@ namespace Jsonzai.Reflect
 {
     public class Jsonfier
     {
-        public static string ToJson(object src)
+        public enum Selection { Fields, Properties, Methods };
+        public static Selection Selected;
+        public static string ToJson(object src, Selection option)
         {
+            Selected = option;
             return Route(src);
         }
 
@@ -29,7 +32,15 @@ namespace Jsonzai.Reflect
             }
             else
             {
-                return GetObjectValues(src);
+                switch (Selected)
+                {
+                    case Selection.Fields:
+                        return GetFieldValues(src);
+                    case Selection.Methods:
+                        return GetNonVoidMethods(src);
+                    default:
+                        return GetPropertyValues(src);
+                }
             }
         }
 
@@ -51,7 +62,7 @@ namespace Jsonzai.Reflect
             MethodInfo lengthMethod = type.GetProperty("Length").GetGetMethod();
             int length = (int)lengthMethod.Invoke(src, null);
 
-            for(int i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
                 object value = methodInfo.Invoke(src, new object[1] { i });
                 string aux = Route(value);
@@ -64,16 +75,15 @@ namespace Jsonzai.Reflect
             return JSON.ToString();
         }
 
-        private static string GetObjectValues(object src)
+        private static string GetPropertyValues(object src)
         {
             StringBuilder JSON = new StringBuilder("{");
             Type type = src.GetType();
             PropertyInfo[] properties = type.GetProperties();
-            for(int i = 0; i < properties.Length; i++)
+            for (int i = 0; i < properties.Length; i++)
             {
                 PropertyInfo property = properties[i];
                 JSON.Append("\"" + property.Name + "\":");
-                object value = property.GetValue(src);
                 string aux = Route(property.GetValue(src));
                 JSON.Append(aux);
                 if (i < properties.Length - 1)
@@ -81,6 +91,29 @@ namespace Jsonzai.Reflect
             }
             JSON.Append("}");
             return JSON.ToString();
+        }
+
+        private static string GetFieldValues(object src)
+        {
+            StringBuilder JSON = new StringBuilder("{");
+            Type type = src.GetType();
+            var fields = type.GetFields();
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var field = fields[i];
+                JSON.Append("\"" + field.Name + "\":");
+                string aux = Route(field.GetValue(src));
+                JSON.Append(aux);
+                if (i < fields.Length - 1)
+                    JSON.Append(",");
+            }
+            JSON.Append("}");
+            return JSON.ToString();
+        }
+
+        private static string GetNonVoidMethods(object src)
+        {
+            throw new NotImplementedException();
         }
     }
 

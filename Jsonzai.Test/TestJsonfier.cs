@@ -18,7 +18,7 @@ namespace Jsonzai.Test
             /*
              * O resultado de ToJson(expected) deve ser igual à string json abaixo
              */
-            string json = Jsonfier.ToJson(expected);
+            string json = Jsonfier.ToJson(expected, Jsonfier.Selection.Fields);
             //string json = "{\"nr\":27721,\"name\":\"Ze Manel\"}";
             Student actual = JsonConvert.DeserializeObject<Student>(json);
             Assert.AreEqual(expected, actual);
@@ -31,7 +31,7 @@ namespace Jsonzai.Test
             /*
              * O resultado de ToJson(expected) deve ser igual à string json abaixo
              */
-            string json = Jsonfier.ToJson(expected);
+            string json = Jsonfier.ToJson(expected, Jsonfier.Selection.Fields);
             //string json = "[4,5,6,7]";
             int[] actual = JsonConvert.DeserializeObject<int[]>(json);
             CollectionAssert.AreEqual(expected, actual);
@@ -53,7 +53,7 @@ namespace Jsonzai.Test
             /*
              * O resultado de ToJson(expected) deve ser igual à string json abaixo
              */
-            string json = Jsonfier.ToJson(expected);
+            string json = Jsonfier.ToJson(expected, Jsonfier.Selection.Fields);
             //string json = "{" +
             //    "\"name\":\"AVE\"," +
             //    "\"stds\":" +
@@ -75,7 +75,7 @@ namespace Jsonzai.Test
             /*
              * O resultado de ToJson(expected) deve ser igual à string json abaixo
              */
-            string json = Jsonfier.ToJson(expected);
+            string json = Jsonfier.ToJson(expected, Jsonfier.Selection.Fields);
             
             string[] actual = JsonConvert.DeserializeObject<string[]>(json);
             CollectionAssert.AreEqual(expected, actual);

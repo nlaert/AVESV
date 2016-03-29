@@ -18,8 +18,8 @@ namespace Jsonzai.Test
             /*
              * O resultado de ToJson(expected) deve ser igual à string json abaixo
              */
-            // string json = Jsonfier.ToJson(expected);
-            string json = "{\"nr\":27721,\"name\":\"Ze Manel\"}";
+            string json = Jsonfier.ToJson(expected);
+            //string json = "{\"nr\":27721,\"name\":\"Ze Manel\"}";
             Student actual = JsonConvert.DeserializeObject<Student>(json);
             Assert.AreEqual(expected, actual);
         }
@@ -31,8 +31,8 @@ namespace Jsonzai.Test
             /*
              * O resultado de ToJson(expected) deve ser igual à string json abaixo
              */
-            // string json = Jsonfier.ToJson(expected);
-            string json = "[4,5,6,7]";
+            string json = Jsonfier.ToJson(expected);
+            //string json = "[4,5,6,7]";
             int[] actual = JsonConvert.DeserializeObject<int[]>(json);
             CollectionAssert.AreEqual(expected, actual);
         }
@@ -53,19 +53,32 @@ namespace Jsonzai.Test
             /*
              * O resultado de ToJson(expected) deve ser igual à string json abaixo
              */
-            // string json = Jsonfier.ToJson(expected);
-            string json = "{" +
-                "\"name\":\"AVE\"," +
-                "\"stds\":" +
-                    "[" +
-                        "{\"nr\":27721,\"name\":\"Ze Manel\"}," +
-                        "{\"nr\":15642,\"name\":\"Maria Papoila\"}," +
-                        "null," +
-                        "null" +
-                    "]" +
-                "}";
+            string json = Jsonfier.ToJson(expected);
+            //string json = "{" +
+            //    "\"name\":\"AVE\"," +
+            //    "\"stds\":" +
+            //        "[" +
+            //            "{\"nr\":27721,\"name\":\"Ze Manel\"}," +
+            //            "{\"nr\":15642,\"name\":\"Maria Papoila\"}," +
+            //            "null," +
+            //            "null" +
+            //        "]" +
+            //    "}";
             Course actual = JsonConvert.DeserializeObject<Course>(json);
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void TestJsonfierArrayStrings()
+        {
+            string[] expected = { "ISEL", "AVE", "SV" };
+            /*
+             * O resultado de ToJson(expected) deve ser igual à string json abaixo
+             */
+            string json = Jsonfier.ToJson(expected);
+            
+            string[] actual = JsonConvert.DeserializeObject<string[]>(json);
+            CollectionAssert.AreEqual(expected, actual);
         }
     }
 }

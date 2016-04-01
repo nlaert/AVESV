@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -14,6 +15,12 @@ namespace Jsonzai.Reflect
         public static string ToJson(object src, Selection option)
         {
             Selected = option;
+            return Route(src);
+        }
+
+        public static string ToJson(object src)
+        {
+            Selected = Selection.Fields;
             return Route(src);
         }
 
@@ -49,6 +56,17 @@ namespace Jsonzai.Reflect
             Type type = src.GetType();
             if (type == typeof(string))
                 return "\"" + src.ToString() + "\"";
+            if (type == typeof(float))
+            {
+                float aux = (float)src;
+                return aux.ToString(CultureInfo.InvariantCulture);
+            }
+            if (type == typeof(double))
+            {
+                double aux = (double)src;
+                return aux.ToString(CultureInfo.InvariantCulture);
+            }
+
             else
                 return src.ToString();
         }

@@ -80,5 +80,13 @@ namespace Jsonzai.Test
             string[] actual = JsonConvert.DeserializeObject<string[]>(json);
             CollectionAssert.AreEqual(expected, actual);
         }
+
+        [TestMethod]
+        public void TestJSonfierNullValue()
+        {
+            object src = null;
+            string actual = Jsonfier.ToJson(src);
+            Assert.AreEqual("null", actual);
+        }
     }
 }

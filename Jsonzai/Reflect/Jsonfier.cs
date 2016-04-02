@@ -91,14 +91,14 @@ namespace Jsonzai.Reflect
         {
             StringBuilder JSON = new StringBuilder("[");
 
-            // Array ar = Enum.GetValues(type);
-            Array ar = Enum.GetNames(type);
-            for (int i = 0; i < ar.Length; i++)
+            
+            Array valueNames = Enum.GetNames(type);
+            for (int i = 0; i < valueNames.Length; i++)
             {
-                object aux = ar.GetValue(i);
+                object aux = valueNames.GetValue(i);
                 string jsonAux = Route(aux);
                 JSON.Append(jsonAux);
-                if (i < ar.Length - 1)
+                if (i < valueNames.Length - 1)
                     JSON.Append(",");
             }
             JSON.Append("]");

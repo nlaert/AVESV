@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -22,6 +23,20 @@ namespace Jsonzai.Reflect
         {
             Selected = Selection.Fields;
             return Route(src);
+        }
+
+        public static string ToJson(Type type)
+        {
+            return Route(type);
+        }
+
+        public static string Route(Type type)
+        {
+            if (type.IsEnum)
+            {
+                return GetEnumNames(type);
+            }
+            return Route((object)type);
         }
 
         private static string Route(object src)
@@ -69,6 +84,25 @@ namespace Jsonzai.Reflect
 
             else
                 return src.ToString();
+        }
+
+       
+        private static string GetEnumNames(Type type)
+        {
+            StringBuilder JSON = new StringBuilder("[");
+
+            // Array ar = Enum.GetValues(type);
+            Array ar = Enum.GetNames(type);
+            for (int i = 0; i < ar.Length; i++)
+            {
+                object aux = ar.GetValue(i);
+                string jsonAux = Route(aux);
+                JSON.Append(jsonAux);
+                if (i < ar.Length - 1)
+                    JSON.Append(",");
+            }
+            JSON.Append("]");
+            return JSON.ToString();
         }
 
         private static string GetArrayValues(object src)

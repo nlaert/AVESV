@@ -5,12 +5,43 @@ using Jsonzai.Test.Model;
 using System.Globalization;
 using Jsonzai.Reflect;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace Jsonzai.Test
 {
     [TestClass]
     public class TestJsonfier
     {
+        enum Colors { Red=3, Green, Blue, Yellow };
+        enum Days : int { Jan, Fev, Mar };
+
+
+        [TestMethod]
+        public void TestEnum1()
+        {
+             String[] expected = { "Red", "Green", "Blue", "Yellow" };
+            /*
+             * O resultado de ToJson(expected) deve ser igual à string json abaixo
+             */
+            string json = Jsonfier.ToJson(typeof(Colors));
+            
+            string[] actual = JsonConvert.DeserializeObject<String[]>(json);
+            CollectionAssert.AreEqual(expected, actual);
+        }
+        [TestMethod]
+        public void TestEnum2()
+        {
+            string[] expected = {"Jan","Fev","Mar" };
+            /*
+             * O resultado de ToJson(expected) deve ser igual à string json abaixo
+             */
+            string json = Jsonfier.ToJson(typeof(Days));
+            //string json = "["\jan\","\Fev\", "\Mar\"]";
+            string[] actual = JsonConvert.DeserializeObject<string[]>(json);
+            CollectionAssert.AreEqual(expected, actual);
+        }
+
         [TestMethod]
         public void TestJsonfierStudent()
         {
@@ -27,7 +58,7 @@ namespace Jsonzai.Test
         [TestMethod]
         public void TestJsonfierArrayPrimitives()
         {
-            int [] expected = { 4, 5, 6, 7};
+            int[] expected = { 4, 5, 6, 7 };
             /*
              * O resultado de ToJson(expected) deve ser igual à string json abaixo
              */
@@ -76,7 +107,7 @@ namespace Jsonzai.Test
              * O resultado de ToJson(expected) deve ser igual à string json abaixo
              */
             string json = Jsonfier.ToJson(expected, Jsonfier.Selection.Fields);
-            
+
             string[] actual = JsonConvert.DeserializeObject<string[]>(json);
             CollectionAssert.AreEqual(expected, actual);
         }
@@ -88,5 +119,6 @@ namespace Jsonzai.Test
             string actual = Jsonfier.ToJson(src);
             Assert.AreEqual("null", actual);
         }
+
     }
 }

@@ -39,6 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Instr\JsonEmitter.cs" />
+    <Compile Include="Instr\IJsonfier.cs" />
+    <Compile Include="Instr\Jsoninstr.cs" />
     <Compile Include="Reflect\Jsonfier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

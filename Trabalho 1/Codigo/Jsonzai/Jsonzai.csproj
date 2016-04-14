@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{4B5E625B-CE09-4C47-B63B-DF6E3EF831C7}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Jsonzai</RootNamespace>
     <AssemblyName>Jsonzai</AssemblyName>
@@ -29,6 +29,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -42,6 +45,8 @@
     <Compile Include="Instr\JsonEmitter.cs" />
     <Compile Include="Instr\IJsonfier.cs" />
     <Compile Include="Instr\Jsoninstr.cs" />
+    <Compile Include="Instr\JsonIntrsConsoleTest.cs" />
+    <Compile Include="Instr\Student.cs" />
     <Compile Include="Reflect\Jsonfier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

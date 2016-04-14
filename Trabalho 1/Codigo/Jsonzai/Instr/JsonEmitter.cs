@@ -15,7 +15,7 @@ namespace Jsonzai.Instr
 
         public static IJsonfier CreateAssembly(Type type)
         {
-            string ASM_NAME = AssemblyNamePrefix + type;
+            string ASM_NAME = AssemblyNamePrefix + type.Name;
             string MOD_NAME = ASM_NAME;
             string TYP_NAME = ASM_NAME;
             string DLL_NAME = ASM_NAME + AssemblyFileExtension;

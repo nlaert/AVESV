@@ -12,7 +12,7 @@ namespace Jsonzai.Instr
         public static string ToJson(object obj)
         {
             IJsonfier jsonfier = FindObject(obj);
-            return ""; // jsonfier.Jsonfy(obj);
+            return jsonfier.Jsonfy(obj);
         }
 
         private static IJsonfier FindObject(object obj)
@@ -42,7 +42,7 @@ namespace Jsonzai.Instr
                 newObj = (IJsonfier)asm.CreateInstance(typeName);
             }
             catch (Exception)
-            {
+            { 
                 return false;
             }
             dict.Add(typeName, newObj);

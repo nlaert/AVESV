@@ -1,18 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 
 
 namespace Jsonzai.Instr
 {
-    class Jsoninstr
+    public class Jsoninstr
     {
         private static Dictionary<String, IJsonfier> dict = new Dictionary<string, IJsonfier>();
 
         public static string ToJson(object obj)
         {
-            IJsonfier jsonfier = FindObject(obj);
-            return jsonfier.Jsonfy(obj);
+            IJsonfier jsonfier = (IJsonfier)FindObject(obj);
+            String aux = "";
+            try {
+                aux = jsonfier.Jsonfy(obj);
+            } catch(Exception e)
+            {
+                Console.Write(e);
+            }
+            return aux;
+           // return jsonfier.Jsonfy(obj);
         }
 
         private static IJsonfier FindObject(object obj)
@@ -26,7 +35,7 @@ namespace Jsonzai.Instr
             {
                 return dict[type.Name];
             }
-            var jsonfier = JsonEmitter.CreateAssembly(type);
+            IJsonfier jsonfier = JsonEmitter.CreateAssembly(type);
             dict.Add(type.Name, jsonfier);
             return jsonfier;
         }
@@ -39,7 +48,7 @@ namespace Jsonzai.Instr
             try
             {
                 asm = Assembly.LoadFrom(JsonEmitter.AssemblyNamePrefix + typeName + JsonEmitter.AssemblyFileExtension);
-                newObj = (IJsonfier)asm.CreateInstance(typeName);
+                newObj = (IJsonfier)asm.CreateInstance(JsonEmitter.AssemblyNamePrefix + typeName);
             }
             catch (Exception)
             { 
@@ -48,5 +57,27 @@ namespace Jsonzai.Instr
             dict.Add(typeName, newObj);
             return true;
         }
+
+        public static string GetPrimitiveValue(object src)
+        {
+            Type type = src.GetType();
+            if (type == typeof(string))
+                return "\"" + src.ToString() + "\"";
+            if (type == typeof(float))
+            {
+                float aux = (float)src;
+                return aux.ToString(CultureInfo.InvariantCulture);
+            }
+            if (type == typeof(double))
+            {
+                double aux = (double)src;
+                return aux.ToString(CultureInfo.InvariantCulture);
+            }
+
+            else
+                return src.ToString();
+        }
+
+
     }
 }

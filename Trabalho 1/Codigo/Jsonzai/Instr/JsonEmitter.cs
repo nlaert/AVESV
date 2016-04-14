@@ -38,6 +38,7 @@ namespace Jsonzai.Instr
             Type jsonfierType = typeBuilder.CreateType();
             asmBuilder.Save(DLL_NAME);
 
+
             return (IJsonfier)Activator.CreateInstance(jsonfierType);
         }
 
@@ -45,14 +46,59 @@ namespace Jsonzai.Instr
         {
             ILGenerator il = jsonfyMethodBuilder.GetILGenerator();
 
-            il.Emit(OpCodes.Ldstr, "Hello World");
-            MethodInfo method = typeof(System.Console).GetMethod("WriteLine",
-                BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null);
-            il.Emit(OpCodes.Call, method);
+            MethodInfo callGetPrimitiveValue = typeof(Jsoninstr).GetMethod("GetPrimitiveValue");
+            MethodInfo callToJson = typeof(Jsoninstr).GetMethod("ToJson");
+            LocalBuilder tobj;
+
+
+            if (!type.IsPrimitive && type != typeof(string))
+            {
+                foreach (var p in type.GetProperties())
+                {
+                    tobj = il.DeclareLocal(type);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Castclass, type);
+                    if (type.IsPrimitive || type == typeof(string))
+                        il.Emit(OpCodes.Call, callGetPrimitiveValue);
+                    else
+                    {
+                        il.Emit(OpCodes.Ldloc_0, p.GetValue());
+                        il.Emit(OpCodes.Call, callToJson);
+                    }
+                        
+                }
+                
+            }
+            else
+            {
+                tobj = il.DeclareLocal(type);
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Castclass, type);
+                il.Emit(OpCodes.Call, callGetPrimitiveValue);
+            }
+            
             il.Emit(OpCodes.Ret);
 
-
-            
         }
+
+       
+
+
+
+
+
+        /*
+        il.Emit(OpCodes.Ldstr, "Hello World");
+        MethodInfo method = typeof(System.Console).GetMethod("WriteLine",
+            BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null);
+        il.Emit(OpCodes.Call, method);
+        il.Emit(OpCodes.Ldstr, "Hello World");
+        il.Emit(OpCodes.Ret);
+
+         */
+
+
+
     }
+    
 }

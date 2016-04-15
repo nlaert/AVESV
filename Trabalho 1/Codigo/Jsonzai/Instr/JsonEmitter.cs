@@ -48,21 +48,44 @@ namespace Jsonzai.Instr
 
             MethodInfo callGetPrimitiveValue = typeof(Jsoninstr).GetMethod("GetPrimitiveValue");
             MethodInfo callToJson = typeof(Jsoninstr).GetMethod("ToJson");
-            LocalBuilder tobj;
+            MethodInfo strBuilderAppend = typeof(StringBuilder).GetMethod("Append", new Type[] { typeof(string) });
+            MethodInfo strBuilderToString = typeof(StringBuilder).GetMethod("ToString", new Type[] { });
+            
+            LocalBuilder strBuilder = il.DeclareLocal(typeof(StringBuilder));
+            LocalBuilder tobj = il.DeclareLocal(typeof(string));
 
+            il.Emit(OpCodes.Call, typeof(StringBuilder).GetConstructor(new Type[] { })); //inicializa StringBuilder
+            
 
             if (!type.IsPrimitive && type != typeof(string))
             {
                 foreach (var p in type.GetProperties())
                 {
-                    tobj = il.DeclareLocal(type);
-                    il.Emit(OpCodes.Ldarg_1);
-                    il.Emit(OpCodes.Castclass, type);
-                    if (type.IsPrimitive || type == typeof(string))
+                    Type propType = p.PropertyType;
+                    
+                    MethodInfo propertyGetMethod = p.GetGetMethod();
+
+                    //il.Emit(OpCodes.Ldarg_1);
+                    //il.Emit(OpCodes.Castclass, propType);
+                    if (propType.IsPrimitive || propType == typeof(string))
+                    {
+                        il.Emit(OpCodes.Call, propertyGetMethod);
                         il.Emit(OpCodes.Call, callGetPrimitiveValue);
+                        il.Emit(OpCodes.Stloc_1); //Guarda o valor retornado 
+
+                        //il.Emit(OpCodes.Ldarg_0); //carrega StringBuilder.this
+                        il.Emit(OpCodes.Ldarg_1); //carrega o valor retornado
+                        il.Emit(OpCodes.Call, strBuilderAppend); //chama StrBuilder.Append
+
+                        //il.Emit(OpCodes.Ldarg_0); //carrega StringBuilder.this
+                        //il.Emit(OpCodes.Stloc, tobj);
+                        il.Emit(OpCodes.Ldstr, ",");
+                        il.Emit(OpCodes.Call, strBuilderAppend);
+
+                    }
                     else
                     {
-                        il.Emit(OpCodes.Ldloc_0, p.GetValue());
+                        il.Emit(OpCodes.Call, propertyGetMethod);
                         il.Emit(OpCodes.Call, callToJson);
                     }
                         
@@ -76,7 +99,7 @@ namespace Jsonzai.Instr
                 il.Emit(OpCodes.Castclass, type);
                 il.Emit(OpCodes.Call, callGetPrimitiveValue);
             }
-            
+            il.Emit(OpCodes.Call, strBuilderToString);
             il.Emit(OpCodes.Ret);
 
         }

@@ -45,78 +45,76 @@ namespace Jsonzai.Instr
         private static void ImplementJsonfyMethod(MethodBuilder jsonfyMethodBuilder, Type type)
         {
             ILGenerator il = jsonfyMethodBuilder.GetILGenerator();
-            ConstructorInfo ctor = typeof(StringBuilder).GetConstructor(new Type[] {});
+            ConstructorInfo ctor = typeof(StringBuilder).GetConstructor(new Type[] { });
             MethodInfo callGetPrimitiveValue = typeof(Jsoninstr).GetMethod("GetPrimitiveValue");
             MethodInfo callToJson = typeof(Jsoninstr).GetMethod("ToJson");
             MethodInfo strBuilderAppend = typeof(StringBuilder).GetMethod("Append", new Type[] { typeof(string) });
             MethodInfo strBuilderToString = typeof(StringBuilder).GetMethod("ToString", new Type[] { });
 
-            LocalBuilder strBuilder = il.DeclareLocal(typeof(StringBuilder));
-            LocalBuilder tobj = il.DeclareLocal(typeof(string));
+            LocalBuilder localStringBuilder = il.DeclareLocal(typeof(StringBuilder));//0
+            LocalBuilder localString = il.DeclareLocal(typeof(string));//1
+            LocalBuilder paramObject = il.DeclareLocal(typeof(object));//2
+            LocalBuilder localObject = il.DeclareLocal(typeof(object));//3
 
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Stloc_2);
             il.Emit(OpCodes.Newobj, ctor);  //inicializa StringBuilder
             il.Emit(OpCodes.Stloc_0);
-            il.Emit(OpCodes.Ldloc_0);
-            il.Emit(OpCodes.Ldstr, "hello");
-            il.Emit(OpCodes.Call, strBuilderAppend);
-            il.Emit(OpCodes.Pop);
-            il.Emit(OpCodes.Ldloc_0);
-            il.Emit(OpCodes.Ldstr, " world");
-            il.Emit(OpCodes.Call, strBuilderAppend);
-            il.Emit(OpCodes.Pop);
+
+            if (!type.IsPrimitive && type != typeof(string))
+            {
+                int i = 0;
+                var properties = type.GetProperties();
+                AppendToStringBuilder(il, strBuilderAppend, "{");
+                foreach (var p in properties)
+                {
+                    Type propType = p.PropertyType;
+
+                    MethodInfo propertyGetMethod = p.GetGetMethod();
+                    AppendToStringBuilder(il, strBuilderAppend, "\"" + p.Name + "\": ");
+                    il.Emit(OpCodes.Ldloc_2);
+                    il.Emit(OpCodes.Call, propertyGetMethod);
+
+                    if (propType.IsPrimitive || propType == typeof(string))
+                    {
+                        il.Emit(OpCodes.Call, callGetPrimitiveValue);
+                    }
+                    else
+                    {
+                        il.Emit(OpCodes.Call, callToJson);
+                    }
+                    il.Emit(OpCodes.Stloc_1);
+                    AppendToStringBuilder(il, strBuilderAppend);
+                    if (i < properties.Length - 1)
+                        AppendToStringBuilder(il, strBuilderAppend, ",");
+                    i++;
+
+                }
+                AppendToStringBuilder(il, strBuilderAppend, "}");
+            }
             il.Emit(OpCodes.Ldloc_0);
             il.Emit(OpCodes.Call, strBuilderToString);
             il.Emit(OpCodes.Stloc_1);
             il.Emit(OpCodes.Ldloc_1);
             il.Emit(OpCodes.Ret);
+
         }
 
-        //    if (!type.IsPrimitive && type != typeof(string))
-        //    {
-        //        foreach (var p in type.GetProperties())
-        //        {
-        //            Type propType = p.PropertyType;
+        private static void AppendToStringBuilder(ILGenerator il, MethodInfo strBuilderAppend)
+        {
+            il.Emit(OpCodes.Ldloc_0);
+            il.Emit(OpCodes.Ldloc_1);
+            il.Emit(OpCodes.Call, strBuilderAppend);
+            il.Emit(OpCodes.Pop);
+        }
 
-        //            MethodInfo propertyGetMethod = p.GetGetMethod();
-
-        //            //il.Emit(OpCodes.Ldarg_1);
-        //            //il.Emit(OpCodes.Castclass, propType);
-        //            if (propType.IsPrimitive || propType == typeof(string))
-        //            {
-        //                il.Emit(OpCodes.Call, propertyGetMethod);
-        //                il.Emit(OpCodes.Call, callGetPrimitiveValue);
-        //                il.Emit(OpCodes.Stloc_1); //Guarda o valor retornado 
-
-        //                //il.Emit(OpCodes.Ldarg_0); //carrega StringBuilder.this
-        //                il.Emit(OpCodes.Ldarg_1); //carrega o valor retornado
-        //                il.Emit(OpCodes.Call, strBuilderAppend); //chama StrBuilder.Append
-
-        //                //il.Emit(OpCodes.Ldarg_0); //carrega StringBuilder.this
-        //                //il.Emit(OpCodes.Stloc, tobj);
-        //                il.Emit(OpCodes.Ldstr, ",");
-        //                il.Emit(OpCodes.Call, strBuilderAppend);
-
-        //            }
-        //            else
-        //            {
-        //                il.Emit(OpCodes.Call, propertyGetMethod);
-        //                il.Emit(OpCodes.Call, callToJson);
-        //            }
-
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        tobj = il.DeclareLocal(type);
-        //        il.Emit(OpCodes.Ldarg_1);
-        //        il.Emit(OpCodes.Castclass, type);
-        //        il.Emit(OpCodes.Call, callGetPrimitiveValue);
-        //    }
-        //    il.Emit(OpCodes.Call, strBuilderToString);
-        //    il.Emit(OpCodes.Ret);
-
-        //}
+        private static void AppendToStringBuilder(ILGenerator il, MethodInfo strBuilderAppend, string str)
+        {
+            il.Emit(OpCodes.Ldloc_0);
+            il.Emit(OpCodes.Ldstr, str);
+            il.Emit(OpCodes.Call, strBuilderAppend);
+            il.Emit(OpCodes.Pop);
+        }
 
 
 

@@ -20,6 +20,7 @@ namespace Jsonzai.Instr
             {
                 Console.Write(e);
             }
+            
             return aux;
            // return jsonfier.Jsonfy(obj);
         }

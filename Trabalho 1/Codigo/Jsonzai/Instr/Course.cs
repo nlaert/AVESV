@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jsonzai.Instr;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,16 +9,24 @@ namespace Jsonzai.Test.Model
 {
     public class Course
     {
-        public Student[] stds;
+        //public Student[] stds;
+        public Student std;
         public string name;
 
+        /*
         public Course(string name, Student[] stds)
         {
             this.stds = stds;
             this.name = name;
         }
+        */
 
-
+        public Course(string name, Student std)
+        {
+            this.std = std;
+            this.name = name;
+        }
+        /*
         public Student[] Students
         {
             get
@@ -27,6 +36,19 @@ namespace Jsonzai.Test.Model
             set
             {
                 stds = value;
+            }
+        }
+        */
+
+        public Student student
+        {
+            get
+            {
+                return std;
+            }
+            set
+            {
+                std = value;
             }
         }
 
@@ -43,7 +65,7 @@ namespace Jsonzai.Test.Model
             }
         }
 
-
+        /*
         // override object.Equals
         public override bool Equals(object obj)
         {
@@ -55,6 +77,7 @@ namespace Jsonzai.Test.Model
             if (other == null) return false;
             return name.Equals(other.name) && Enumerable.SequenceEqual(this.stds, other.stds);
         }
+        */
     }
 
 }

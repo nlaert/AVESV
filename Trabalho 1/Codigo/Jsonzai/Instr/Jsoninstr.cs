@@ -13,6 +13,7 @@ namespace Jsonzai.Instr
         public static string ToJson(object obj)
         {
             IJsonfier jsonfier = FindObject(obj);
+
             String aux = "";
             try {
                 aux = jsonfier.Jsonfy(obj);

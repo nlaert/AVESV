@@ -55,11 +55,18 @@ namespace Jsonzai.Instr
             LocalBuilder localString = il.DeclareLocal(typeof(string));//1
             LocalBuilder paramObject = il.DeclareLocal(typeof(object));//2
             LocalBuilder localObject = il.DeclareLocal(typeof(object));//3
+    
 
-            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldarg_1); //carrega o arg 0 para a stack
             il.Emit(OpCodes.Stloc_2);
             il.Emit(OpCodes.Newobj, ctor);  //inicializa StringBuilder
             il.Emit(OpCodes.Stloc_0);
+
+            il.Emit(OpCodes.Ldarg_1);
+            MethodInfo method = typeof(System.Console).GetMethod("WriteLine",
+                BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(object) }, null);
+            il.Emit(OpCodes.Call, method);
+
 
             if (!type.IsPrimitive && type != typeof(string))
             {
@@ -71,12 +78,28 @@ namespace Jsonzai.Instr
                     Type propType = p.PropertyType;
 
                     MethodInfo propertyGetMethod = p.GetGetMethod();
+                  
                     AppendToStringBuilder(il, strBuilderAppend, "\"" + p.Name + "\": ");
                     il.Emit(OpCodes.Ldloc_2);
-                    il.Emit(OpCodes.Call, propertyGetMethod);
+                    il.Emit(OpCodes.Call, propertyGetMethod);//retorna o valor
+                    
+        
 
                     if (propType.IsPrimitive || propType == typeof(string))
                     {
+                      if(propType.IsValueType)
+                        {
+                            il.Emit(OpCodes.Box, propType);
+ 
+                        }
+                      else
+                        {
+                            localObject = il.DeclareLocal(propType);
+                            il.Emit(OpCodes.Castclass, typeof(object));
+                            il.Emit(OpCodes.Stloc_3);
+                            il.Emit(OpCodes.Ldloc_3);
+                        }
+
                         il.Emit(OpCodes.Call, callGetPrimitiveValue);
                     }
                     else

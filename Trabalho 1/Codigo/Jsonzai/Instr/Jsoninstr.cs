@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 
 
@@ -29,16 +28,20 @@ namespace Jsonzai.Instr
         private static IJsonfier FindObject(object obj)
         {
             Type type = obj.GetType();
-            if (dict.ContainsKey(type.Name))
+            string typeName = type.Name;
+            if (type.IsArray)
+                typeName = EmitterHelper.removeCaracteres(typeName);
+
+            if (dict.ContainsKey(typeName))
             {
-                return dict[type.Name];
+                return dict[typeName];
             }
             if (LoadAssemblies(obj))
             {
-                return dict[type.Name];
+                return dict[typeName];
             }
-            IJsonfier jsonfier = JsonEmitter.CreateAssembly(type);
-            dict.Add(type.Name, jsonfier);
+            IJsonfier jsonfier = new JsonEmitter().CreateAssembly(type);
+            dict.Add(typeName, jsonfier);
             return jsonfier;
         }
 
@@ -46,7 +49,11 @@ namespace Jsonzai.Instr
         {
             Assembly asm;
             IJsonfier newObj;
-            string typeName = obj.GetType().Name;
+            Type type = obj.GetType();
+            string typeName = type.Name;
+            if (type.IsArray)
+                typeName = EmitterHelper.removeCaracteres(typeName);
+
             try
             {
                 asm = Assembly.LoadFrom(JsonEmitter.AssemblyNamePrefix + typeName + JsonEmitter.AssemblyFileExtension);
@@ -60,25 +67,7 @@ namespace Jsonzai.Instr
             return true;
         }
 
-        public static string GetPrimitiveValue(object src)
-        {
-            Type type = src.GetType();
-            if (type == typeof(string))
-                return "\"" + src.ToString() + "\"";
-            if (type == typeof(float))
-            {
-                float aux = (float)src;
-                return aux.ToString(CultureInfo.InvariantCulture);
-            }
-            if (type == typeof(double))
-            {
-                double aux = (double)src;
-                return aux.ToString(CultureInfo.InvariantCulture);
-            }
 
-            else
-                return src.ToString();
-        }
 
 
     }

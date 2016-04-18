@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Instr\EmitterHelper.cs" />
+    <Compile Include="Instr\Course2.cs" />
     <Compile Include="Instr\Course.cs" />
     <Compile Include="Instr\JsonEmitter.cs" />
     <Compile Include="Instr\IJsonfier.cs" />

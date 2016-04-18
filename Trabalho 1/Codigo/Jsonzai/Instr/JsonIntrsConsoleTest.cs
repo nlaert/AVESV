@@ -15,12 +15,25 @@ namespace Jsonzai.Instr
             var s = new Student(35466, "Nick");
 
             Course expected = new Course
+            (
+                "AVE",
+                new Student[4]{
+                    new Student(27721, "Ze Manel"),
+                    new Student(15642, "Maria Papoila"),
+                    null,
+                    null
+                }
+            );
+
+            Course2 course2 = new Course2
            (
-               "AVE",
-              new Student(35466, "Nick")
-               
+               "AVE",new Student(27721, "Ze Manel")
+
            );
-            Jsoninstr.ToJson(expected);
+
+            // Console.WriteLine(Jsoninstr.ToJson(course2));
+            Console.WriteLine(Jsoninstr.ToJson("batatas"));
+
         }
     }
 }

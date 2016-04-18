@@ -192,39 +192,21 @@ namespace Jsonzai.Instr
        
 
         
-        private void GetArrayValues(Type type)
+        private void GetArrayValues()
         {
             // StringBuilder JSON = new StringBuilder("[");
-            
-           var methodInfo = type.GetMethod("GetValue", new Type[] { typeof(Int32) });
+           // AppendToStringBuilder("[");
 
-            int length = GetLength(type);
-
-            MethodInfo lengthMethod = type.GetProperty("Length").GetGetMethod();
-
-
-            il.Emit(OpCodes.Call, lengthMethod);
-
-
-            int length = (int)lengthMethod.Invoke(src, null);
-            AppendToStringBuilder("[");
             il.Emit(OpCodes.Ldloc_2);
             MethodInfo callArrayToJson = typeof(EmitterHelper).GetMethod("ArrayToJson");
+            il.Emit(OpCodes.Call, callArrayToJson);
             il.Emit(OpCodes.Stloc_1);
             AppendToStringBuilder();
           //  AppendToStringBuilder("]");
 
         }
 
-        private int GetLength(Type type)
-        {
-            il.Emit(OpCodes.Ldloc_2);
-            MethodInfo lengthMethod = type.GetProperty("Length").GetGetMethod();
-            il.Emit(OpCodes.Call, lengthMethod);
-            il.Emit(OpCodes.Pop);
-        }
-
-
+       
 
 
 

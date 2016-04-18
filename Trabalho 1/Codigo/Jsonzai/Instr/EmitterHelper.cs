@@ -41,8 +41,16 @@ namespace Jsonzai.Instr
             StringBuilder strBuilder = new StringBuilder();
             strBuilder.Append("[");
             for (int i = 0; i < src.Length; i++)
-            {
-                strBuilder.Append(Jsoninstr.ToJson(src[i]));
+            { 
+                if(src[i].GetType().IsPrimitive)
+                {
+                    strBuilder.Append(EmitterHelper.GetPrimitiveValue(src[i]));
+                }
+                else
+                {
+                    strBuilder.Append(Jsoninstr.ToJson(src[i]));
+                }
+              
                 if (i < src.Length - 1)
                     strBuilder.Append(",");
             }

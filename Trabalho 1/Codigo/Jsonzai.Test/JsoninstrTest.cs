@@ -22,7 +22,7 @@ namespace Jsonzai.Test
             Assert.AreEqual(expected, actual);
         }
 
-        //[TestMethod]
+       [TestMethod]
         public void TestJsoninstrArrayPrimitives()
         {
             int[] expected = { 4, 5, 6, 7 };

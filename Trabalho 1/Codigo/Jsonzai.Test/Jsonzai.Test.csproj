@@ -56,7 +56,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="JsoninstrTest.cs" />
-    <Compile Include="JsoninstrTests.cs" />
     <Compile Include="Model\Course.cs" />
     <Compile Include="Model\Student.cs" />
     <Compile Include="NumericTypesTest.cs" />

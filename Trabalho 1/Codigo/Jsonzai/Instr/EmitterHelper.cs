@@ -30,9 +30,25 @@ namespace Jsonzai.Instr
                 return src.ToString();
         }
 
-        public static string removeCaracteres(string typeName)
+        public static string RemoveCaracteres(string typeName)
         {
-            return typeName.Substring(0, typeName.Length - 2);
+            //return typeName.Substring(0, typeName.Length - 2);
+            return typeName;
+        }
+
+        private static string ArrayToJson(object[] src)
+        {
+            StringBuilder strBuilder = new StringBuilder();
+            strBuilder.Append("[");
+            for (int i = 0; i < src.Length; i++)
+            {
+                strBuilder.Append(Jsoninstr.ToJson(src[i]));
+                if (i < src.Length - 1)
+                    strBuilder.Append(",");
+            }
+            strBuilder.Append("]");
+            return strBuilder.ToString();
+
         }
     }
 }

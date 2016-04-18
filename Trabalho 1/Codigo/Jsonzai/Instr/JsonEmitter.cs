@@ -22,7 +22,7 @@ namespace Jsonzai.Instr
         LocalBuilder localStringBuilder;
         LocalBuilder localString;
         LocalBuilder paramObject;
-        LocalBuilder localObject;
+        LocalBuilder lengthLocal;
 
 
 
@@ -33,7 +33,7 @@ namespace Jsonzai.Instr
         {
             string typeName = type.Name;
             if (type.IsArray)
-                typeName = EmitterHelper.removeCaracteres(typeName);
+                typeName = EmitterHelper.RemoveCaracteres(typeName);
             string ASM_NAME = AssemblyNamePrefix + typeName;
             string MOD_NAME = ASM_NAME;
             string TYP_NAME = ASM_NAME;
@@ -73,7 +73,7 @@ namespace Jsonzai.Instr
             localStringBuilder = il.DeclareLocal(typeof(StringBuilder));//0
             localString = il.DeclareLocal(typeof(string));//1
             paramObject = il.DeclareLocal(typeof(object));//2
-            localObject = il.DeclareLocal(typeof(object));//3
+            lengthLocal = il.DeclareLocal(typeof(int));//3
     
 
             il.Emit(OpCodes.Ldarg_1); //carrega o arg 1 (obj) para a stack
@@ -86,8 +86,11 @@ namespace Jsonzai.Instr
                 BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(object) }, null);
             il.Emit(OpCodes.Call, method);
 
-
-            if (!type.IsPrimitive && type != typeof(string))
+            if (type.IsArray)
+            {
+                GetArrayValues();
+            }
+            else if (!type.IsPrimitive && type != typeof(string))
             {
                 int i = 0;
                 var properties = type.GetProperties();
@@ -113,10 +116,10 @@ namespace Jsonzai.Instr
                         }
                         else
                         {
-                            localObject = il.DeclareLocal(propType);
+                            lengthLocal = il.DeclareLocal(propType);
                             il.Emit(OpCodes.Castclass, typeof(object));
-                            il.Emit(OpCodes.Stloc_3);
-                            il.Emit(OpCodes.Ldloc_3);
+                           // il.Emit(OpCodes.Stloc_3);
+                           // il.Emit(OpCodes.Ldloc_3);
                         }
 
                         il.Emit(OpCodes.Call, callGetPrimitiveValue);
@@ -174,10 +177,10 @@ namespace Jsonzai.Instr
             }
             else
             {
-                localObject = il.DeclareLocal(type);
+                lengthLocal = il.DeclareLocal(type);
                 il.Emit(OpCodes.Castclass, typeof(object));
-                il.Emit(OpCodes.Stloc_3);
-                il.Emit(OpCodes.Ldloc_3);
+               // il.Emit(OpCodes.Stloc_3);
+              //  il.Emit(OpCodes.Ldloc_3);
             }
             il.Emit(OpCodes.Call, callGetPrimitiveValue);
             il.Emit(OpCodes.Stloc_1);
@@ -189,31 +192,50 @@ namespace Jsonzai.Instr
        
 
         
-        private static void GetArrayValues(object src)
+        private void GetArrayValues(Type type)
         {
-            StringBuilder JSON = new StringBuilder("[");
-            Type type = src.GetType();
-            var methodInfo = type.GetMethod("GetValue", new Type[] { typeof(Int32) });
+            // StringBuilder JSON = new StringBuilder("[");
+            
+           var methodInfo = type.GetMethod("GetValue", new Type[] { typeof(Int32) });
+
+            int length = GetLength(type);
 
             MethodInfo lengthMethod = type.GetProperty("Length").GetGetMethod();
+
+
+            il.Emit(OpCodes.Call, lengthMethod);
+
+
             int length = (int)lengthMethod.Invoke(src, null);
+            AppendToStringBuilder("[");
+            il.Emit(OpCodes.Ldloc_2);
+            MethodInfo callArrayToJson = typeof(EmitterHelper).GetMethod("ArrayToJson");
+            il.Emit(OpCodes.Stloc_1);
+            AppendToStringBuilder();
+          //  AppendToStringBuilder("]");
 
-            for (int i = 0; i < length; i++)
-            {
-                object value = methodInfo.Invoke(src, new object[1] { i });
-                string aux = Route(value);
-                JSON.Append(aux);
-                if (i < length - 1)
-                    JSON.Append(",");
-
-            }
-            JSON.Append("]");
-            return JSON.ToString();
         }
-        */
+
+        private int GetLength(Type type)
+        {
+            il.Emit(OpCodes.Ldloc_2);
+            MethodInfo lengthMethod = type.GetProperty("Length").GetGetMethod();
+            il.Emit(OpCodes.Call, lengthMethod);
+            il.Emit(OpCodes.Pop);
+        }
 
 
 
+
+
+        //    object value = methodGetValue.Invoke(src, new object[1] { i });
+        //    string aux = Route(value);
+        //    JSON.Append(aux);
+        //    if (i < length - 1)
+        //        JSON.Append(",");
+
+        //}
+        //    AppendToStringBuilder("]");
 
 
 

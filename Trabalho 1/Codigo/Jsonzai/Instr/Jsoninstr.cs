@@ -11,6 +11,8 @@ namespace Jsonzai.Instr
 
         public static string ToJson(object obj)
         {
+            if (obj == null)
+                return "null";
             IJsonfier jsonfier = FindObject(obj);
 
             String aux = "";
@@ -30,7 +32,7 @@ namespace Jsonzai.Instr
             Type type = obj.GetType();
             string typeName = type.Name;
             if (type.IsArray)
-                typeName = EmitterHelper.removeCaracteres(typeName);
+                typeName = EmitterHelper.RemoveCaracteres(typeName);
 
             if (dict.ContainsKey(typeName))
             {
@@ -52,7 +54,7 @@ namespace Jsonzai.Instr
             Type type = obj.GetType();
             string typeName = type.Name;
             if (type.IsArray)
-                typeName = EmitterHelper.removeCaracteres(typeName);
+                typeName = EmitterHelper.RemoveCaracteres(typeName);
 
             try
             {

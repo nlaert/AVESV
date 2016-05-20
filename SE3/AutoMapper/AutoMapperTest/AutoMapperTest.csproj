@@ -56,9 +56,9 @@
     <Compile Include="Student.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
+    <ProjectReference Include="..\AutoMapper\AutoMapperPrj.csproj">
       <Project>{46f8504a-a314-463f-a78b-44c41250498f}</Project>
-      <Name>AutoMapper</Name>
+      <Name>AutoMapperPrj</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

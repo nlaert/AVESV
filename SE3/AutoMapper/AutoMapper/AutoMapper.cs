@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoMapper
+namespace AutoMapperPrj
 {
 
     public interface Mapper<TSrc, TDest> 
@@ -14,17 +14,20 @@ namespace AutoMapper
         TColDest Map<TColDest>(IEnumerable<TSrc> src) where TColDest : ICollection<TDest>; 
     }
 
-    public class GenMapper<TSrc, TDest> : Mapper<TSrc, TDest>
+    public class AutoMapper<TSrc, TDest> : Mapper<TSrc, TDest>
     {
-        
+        TSrc SrcType;
+        TDest DestType;
 
         public Mapper<TSrc, TDest> CreateMapper()
         {
+            throw new NotImplementedException();
         }
 
-        public static void Build<TOne, TTwo>()//o que fazer aqui??
+        public static Builder<TOne, TTwo> Build<TOne, TTwo>()//Cria um objecto Builder que tem varios metodos de configuraçao e retorna esse objecto
         {
-            throw new NotImplementedException();
+            Builder<TOne, TTwo> builder = new Builder<TOne, TTwo>();
+            return builder;
         }
 
         public TDest Map(TSrc src)

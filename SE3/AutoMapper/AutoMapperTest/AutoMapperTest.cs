@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AutoMapper;
+using AutoMapperPrj;
 
 namespace AutoMapperTest
 {
@@ -10,7 +10,7 @@ namespace AutoMapperTest
         [TestMethod]
         public void MapTest()
         {
-            Mapper<Student, Person> m = AutoMapper.Build<Student, Person>().CreateMapper();
+            Mapper<Student, Person> m =
             Student s = new Student { Nr = 27721, Name = "Ze Manel" }; 
             Person p = m.Map(s); 
             Assert.AreEqual(s.Name, p.Name); 

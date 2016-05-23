@@ -18,25 +18,24 @@ namespace AutoMapperPrj
     {
         TSrc SrcType;
         TDest DestType;
+        private Builder builder;
 
-        public Mapper<TSrc, TDest> CreateMapper()
+        public AutoMapper(Builder builder)
         {
-            throw new NotImplementedException();
-        }
-
-        public static Builder<TOne, TTwo> Build<TOne, TTwo>()//Cria um objecto Builder que tem varios metodos de configuraçao e retorna esse objecto
-        {
-            Builder<TOne, TTwo> builder = new Builder<TOne, TTwo>();
-            return builder;
+            this.builder = builder;
         }
 
         public TDest Map(TSrc src)
         {
-            Type srcType = typeof(TSrc);
-            Type destType = typeof(TDest);
-            PropertyInfo[] srcProps = srcType.GetProperties().OrderBy(prop => prop.Name).ToArray();
-            PropertyInfo[] destProps = destType.GetProperties().OrderBy(prop => prop.Name).ToArray();
-            return CopyValues(src, srcProps, destProps);
+            TDest dest = (TDest)Activator.CreateInstance(typeof(TDest));
+            Dictionary<PropertyInfo, PropertyInfo> dict = builder.PropertiesDictionary;
+            PropertyInfo[] props = dict.Keys.ToArray();
+            foreach (PropertyInfo p in props)
+            {
+                object aux = p.GetValue(src);
+                dict[p].SetValue(dest, aux);
+            }
+            return dest;
             
         }
 

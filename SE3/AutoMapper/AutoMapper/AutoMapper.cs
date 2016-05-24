@@ -16,24 +16,43 @@ namespace AutoMapperPrj
 
     public class AutoMapper<TSrc, TDest> : Mapper<TSrc, TDest>
     {
-        TSrc SrcType;
-        TDest DestType;
-        private Builder builder;
-
-        public AutoMapper(Builder builder)
+        public Dictionary<PropertyInfo, PropertyInfo> PropertiesDictionary { get; set; }
+        public Type Src;
+        public Type Dest;
+        public static AutoMapper<TSrc, TDest> Build<TSrc, TDest>()
         {
-            this.builder = builder;
+            return new AutoMapper<TSrc, TDest>();
+        }
+        public AutoMapper()
+        {
+        }
+
+        public Mapper<TSrc, TDest> CreateMapper()
+        {
+            Type srcType = typeof(TSrc);
+            Type destType = typeof(TDest);
+            PropertiesDictionary = new Dictionary<PropertyInfo, PropertyInfo>();
+            PropertyInfo[] srcProps = srcType.GetProperties().OrderBy(prop => prop.Name).ToArray();
+            PropertyInfo[] destProps = destType.GetProperties().OrderBy(prop => prop.Name).ToArray();
+            for (int i = 0, j = 0; i < srcProps.Length && j < destProps.Length; i++)
+            {
+                if (srcProps[i].Name.Equals(destProps[j].Name))
+                {
+                    PropertiesDictionary.Add(srcProps[i], destProps[i]);
+                    j++;
+                }
+            }
+            return this;
         }
 
         public TDest Map(TSrc src)
         {
             TDest dest = (TDest)Activator.CreateInstance(typeof(TDest));
-            Dictionary<PropertyInfo, PropertyInfo> dict = builder.PropertiesDictionary;
-            PropertyInfo[] props = dict.Keys.ToArray();
+            PropertyInfo[] props = PropertiesDictionary.Keys.ToArray();
             foreach (PropertyInfo p in props)
             {
                 object aux = p.GetValue(src);
-                dict[p].SetValue(dest, aux);
+                PropertiesDictionary[p].SetValue(dest, aux);
             }
             return dest;
             

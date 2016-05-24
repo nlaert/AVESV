@@ -10,7 +10,7 @@ namespace AutoMapperTest
         [TestMethod]
         public void MapTest()
         {
-            Mapper<Student, Person> m = Builder<Student, Person>.Build<Student, Person>().CreateMapper();
+            Mapper<Student, Person> m = Builder.Build<Student, Person>().CreateMapper();
             Student s = new Student{ Nr = 27721, Name = "Ze Manel" }; 
             Person p = m.Map(s); 
             Assert.AreEqual(s.Name, p.Name); 

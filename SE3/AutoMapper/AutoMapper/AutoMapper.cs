@@ -36,7 +36,7 @@ namespace AutoMapperPrj
             PropertyInfo[] destProps = destType.GetProperties().OrderBy(prop => prop.Name).ToArray();
             for (int i = 0, j = 0; i < srcProps.Length && j < destProps.Length; i++)
             {
-                if (srcProps[i].Name.Equals(destProps[j].Name))
+                if (srcProps[i].Name.Equals(destProps[j].Name) && srcProps[i].GetType() == destProps[j].GetType())
                 {
                     PropertiesDictionary.Add(srcProps[i], destProps[i]);
                     j++;
@@ -60,7 +60,13 @@ namespace AutoMapperPrj
 
         public TColDest Map<TColDest>(IEnumerable<TSrc> src) where TColDest : ICollection<TDest>
         {
-            throw new NotImplementedException();
+            TColDest destCol;
+            destCol = Activator.CreateInstance<TColDest>();
+            foreach (var s in src)
+            {
+                destCol.Add(Map(s));
+            }
+            return destCol;
         }
 
         private TDest CopyValues(TSrc src, PropertyInfo[] srcProps, PropertyInfo[] destProps)

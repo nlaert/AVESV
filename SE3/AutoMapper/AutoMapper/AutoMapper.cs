@@ -54,13 +54,13 @@ namespace AutoMapperPrj
             Type srcType = typeof(TSrc);
             Type destType = typeof(TDest);
             
-            PropertyInfo[] srcProps = srcType.GetProperties().OrderBy(prop => prop.Name).ToArray();
-            PropertyInfo[] destProps = destType.GetProperties().OrderBy(prop => prop.Name).ToArray();
-            for (int i = 0, j = 0; i < srcProps.Length && j < destProps.Length; i++)
+            PropertyInfo[] destProps = destType.GetProperties().ToArray();
+            for (int i = 0, j = 0; i < destProps.Length; i++)
             {
-                if (IsCompatible(srcProps[i], destProps[j], ref j))
+                PropertyInfo srcProp = srcType.GetProperty(destProps[i].Name);
+                if (IsCompatible(srcProp, destProps[i], ref j))
                 {
-                    PropertiesDictionary.Add(srcProps[i], destProps[j]);
+                    PropertiesDictionary.Add(destProps[i], srcProp);
                     j++;
                 }
             }
@@ -74,8 +74,9 @@ namespace AutoMapperPrj
             foreach (PropertyInfo p in props)
             {
                 object aux = GetValue(p, src);
-                PropertiesDictionary[p].SetValue(dest, aux);
+                p.SetValue(dest, aux);
             }
+
             return dest;
         }
 
@@ -112,12 +113,14 @@ namespace AutoMapperPrj
 
         private bool IsCompatible(PropertyInfo src, PropertyInfo dest, ref int j)
         {
-            if ((!src.Name.Equals(dest.Name) || src.GetType() != dest.GetType()) && 
-                !ForMemberDictionary.ContainsKey(dest.Name))
+            if (src == null)
+            {
+                return ForMemberDictionary.ContainsKey(dest.Name);
+            }
+            if (!src.Name.Equals(dest.Name) || src.GetType() != dest.GetType())
             {
                 return false;
             }
-                
             foreach (string str in NamesToBeIgnored)
             {
                 if (str.Equals(src.Name))
@@ -140,13 +143,13 @@ namespace AutoMapperPrj
 
         private object GetValue(PropertyInfo property, TSrc src)
         {
-            string destName = PropertiesDictionary[property].Name;
+            string destName = property.Name;
             if (ForMemberDictionary.ContainsKey(destName))
             {
                 Func<TSrc, object> func = ForMemberDictionary[destName];
                 return func(src);
             }
-            return property.GetValue(src);
+            return PropertiesDictionary[property].GetValue(src);
         }
     }
 }

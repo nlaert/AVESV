@@ -83,7 +83,7 @@ namespace AutoMapperTest
             Mapper<Student, User> m = Builder.Build<Student, User>().ForMember("Id", src => src.Nr.ToString()).CreateMapper();
             Student s = new Student { Nr = 27721, Name = "Ze Manel" };
             User p = m.Map(s);
-            Assert.AreNotEqual(s.Name, p.Name);
+            Assert.AreEqual(s.Name, p.Name);
             Assert.AreEqual(s.Nr.ToString(), p.Id);
         }
     }

@@ -55,5 +55,25 @@ namespace AutoMapperTest
                 Assert.AreEqual(exp.Current, act.Current);
             }
         }
+
+        [TestMethod]
+        public void IgnoreMemberTest()
+        {
+            Mapper<Student, Person> m = Builder.Build<Student, Person>().IgnoreMember("Name").CreateMapper();
+            Student s = new Student { Nr = 27721, Name = "Ze Manel" };
+            Person p = m.Map(s);
+            Assert.AreNotEqual(s.Name, p.Name);
+            Assert.AreEqual(s.Nr, p.Nr);
+        }
+
+        [TestMethod]
+        public void IgnoreAttributeTest()
+        {
+            Mapper<Professor, Person> m = Builder.Build<Professor, Person>().IgnoreMember<MapperIgnoreAttribute>().CreateMapper();
+            Professor s = new Professor { Nr = 27721, Name = "Ze Manel" };
+            Person p = m.Map(s);
+            Assert.AreNotEqual(s.Name, p.Name);
+            Assert.AreEqual(s.Nr, p.Nr);
+        }
     }
 }

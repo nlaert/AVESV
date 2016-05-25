@@ -19,23 +19,28 @@ namespace AutoMapperPrj
     public class AutoMapper<TSrc, TDest> : Mapper<TSrc, TDest>
     {
         public Dictionary<PropertyInfo, PropertyInfo> PropertiesDictionary { get; set; }
-        public List<string> ToBeIgnoredList;
-        public static AutoMapper<TSrc, TDest> Build<TOne, Ttwo>()
-        {
-            return new AutoMapper<TSrc, TDest>();
-        }
-
-        //public static AutoMapper<TSrc, TDest> IgnoreMember(this AutoMapper<TSrc, TDest> am, string name)
-        //{
-        //    am.ToBeIgnoredList.Add(name);
-        //    return am;
-        //}
-
+        public List<string> NamesToBeIgnored;
+        public List<Type> AttributesToBeIgnored;
         public AutoMapper()
         {
             PropertiesDictionary = new Dictionary<PropertyInfo, PropertyInfo>();
-            ToBeIgnoredList = new List<string>();
+            NamesToBeIgnored = new List<string>();
+            AttributesToBeIgnored = new List<Type>();
         }
+
+        public AutoMapper<TSrc, TDest> IgnoreMember(string name)
+        {
+            NamesToBeIgnored.Add(name);
+            return this;
+        }
+
+        public AutoMapper<TSrc, TDest> IgnoreMember<TAttribute>() where TAttribute : System.Attribute
+        {
+            Type t = typeof(TAttribute);
+            AttributesToBeIgnored.Add(t);
+            return this;
+        }
+        
 
         public Mapper<TSrc, TDest> CreateMapper()
         {
@@ -46,7 +51,7 @@ namespace AutoMapperPrj
             PropertyInfo[] destProps = destType.GetProperties().OrderBy(prop => prop.Name).ToArray();
             for (int i = 0, j = 0; i < srcProps.Length && j < destProps.Length; i++)
             {
-                if (IsCompatible(srcProps[i], destProps[j]))
+                if (IsCompatible(srcProps[i], destProps[j], ref j))
                 {
                     PropertiesDictionary.Add(srcProps[i], destProps[j]);
                     j++;
@@ -101,14 +106,28 @@ namespace AutoMapperPrj
             }
         }
 
-        private bool IsCompatible(PropertyInfo src, PropertyInfo dest)
+        private bool IsCompatible(PropertyInfo src, PropertyInfo dest, ref int j)
         {
-            foreach (string str in ToBeIgnoredList)
+            if (!src.Name.Equals(dest.Name) || src.GetType() != dest.GetType())
+                return false;
+            foreach (string str in NamesToBeIgnored)
             {
-                if (!str.Equals(src.Name))
+                if (str.Equals(src.Name))
+                {
+                    j++;
                     return false;
+                }
+                    
             }
-            return src.Name.Equals(dest.Name) && src.GetType() == dest.GetType();
+            foreach (Type t in AttributesToBeIgnored)
+            {
+                if (src.GetCustomAttribute(t) != null)
+                {
+                    j++;
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

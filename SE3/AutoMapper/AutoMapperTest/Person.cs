@@ -29,14 +29,12 @@ namespace AutoMapperTest
             Person p = (Person)obj;
             if (p.Name.Equals(Name) && p.Nr == Nr)
                 return true;
-            return base.Equals(obj);
+            return false;
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            // TODO: write your implementation of GetHashCode() here
-            throw new NotImplementedException();
             return base.GetHashCode();
         }
     }

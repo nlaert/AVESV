@@ -27,5 +27,33 @@ namespace AutoMapperTest
             Person[] actual = ps.ToArray();
             CollectionAssert.AreEqual(expected, actual);
         }
+
+        [TestMethod]
+        public void MapToArrayTest()
+        {
+            Student[] stds = { new Student { Nr = 27721, Name = "Ze Manel" }, new Student { Nr = 15642, Name = "Maria Papoila" } };
+            Person[] expected = { new Person { Nr = 27721, Name = "Ze Manel" }, new Person { Nr = 15642, Name = "Maria Papoila" } };
+            Mapper<Student, Person> m = Builder.Build<Student, Person>().CreateMapper();
+            Person[] actual = m.MapToArray(stds);
+            CollectionAssert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void MapLazyTest()
+        {
+            Student[] stds = { new Student { Nr = 27721, Name = "Ze Manel" }, new Student { Nr = 15642, Name = "Maria Papoila" } };
+            List<Person> expected = new List<Person>();
+            expected.Add(new Person { Nr = 27721, Name = "Ze Manel" });
+            expected.Add(new Person { Nr = 15642, Name = "Maria Papoila" });
+            Mapper<Student, Person> m = Builder.Build<Student, Person>().CreateMapper();
+            IEnumerable<Person> actual = m.MapLazy(stds);
+            IEnumerator<Person> exp = expected.GetEnumerator();
+            IEnumerator<Person> act = actual.GetEnumerator();
+
+            while (exp.MoveNext() && act.MoveNext())
+            {
+                Assert.AreEqual(exp.Current, act.Current);
+            }
+        }
     }
 }

@@ -11,34 +11,44 @@ namespace AutoMapperPrj
     public interface Mapper<TSrc, TDest> 
     { 
         TDest Map(TSrc src);
-        TColDest Map<TColDest>(IEnumerable<TSrc> src) where TColDest : ICollection<TDest>; 
+        TColDest Map<TColDest>(IEnumerable<TSrc> src) where TColDest : ICollection<TDest>;
+        TDest[] MapToArray(IEnumerable<TSrc> src);
+        IEnumerable<TDest> MapLazy(IEnumerable<TSrc> src);
     }
 
     public class AutoMapper<TSrc, TDest> : Mapper<TSrc, TDest>
     {
         public Dictionary<PropertyInfo, PropertyInfo> PropertiesDictionary { get; set; }
-        public Type Src;
-        public Type Dest;
-        public static AutoMapper<TSrc, TDest> Build<TSrc, TDest>()
+        public List<string> ToBeIgnoredList;
+        public static AutoMapper<TSrc, TDest> Build<TOne, Ttwo>()
         {
             return new AutoMapper<TSrc, TDest>();
         }
+
+        //public static AutoMapper<TSrc, TDest> IgnoreMember(this AutoMapper<TSrc, TDest> am, string name)
+        //{
+        //    am.ToBeIgnoredList.Add(name);
+        //    return am;
+        //}
+
         public AutoMapper()
         {
+            PropertiesDictionary = new Dictionary<PropertyInfo, PropertyInfo>();
+            ToBeIgnoredList = new List<string>();
         }
 
         public Mapper<TSrc, TDest> CreateMapper()
         {
             Type srcType = typeof(TSrc);
             Type destType = typeof(TDest);
-            PropertiesDictionary = new Dictionary<PropertyInfo, PropertyInfo>();
+            
             PropertyInfo[] srcProps = srcType.GetProperties().OrderBy(prop => prop.Name).ToArray();
             PropertyInfo[] destProps = destType.GetProperties().OrderBy(prop => prop.Name).ToArray();
             for (int i = 0, j = 0; i < srcProps.Length && j < destProps.Length; i++)
             {
-                if (srcProps[i].Name.Equals(destProps[j].Name) && srcProps[i].GetType() == destProps[j].GetType())
+                if (IsCompatible(srcProps[i], destProps[j]))
                 {
-                    PropertiesDictionary.Add(srcProps[i], destProps[i]);
+                    PropertiesDictionary.Add(srcProps[i], destProps[j]);
                     j++;
                 }
             }
@@ -69,20 +79,36 @@ namespace AutoMapperPrj
             return destCol;
         }
 
-        private TDest CopyValues(TSrc src, PropertyInfo[] srcProps, PropertyInfo[] destProps)
+        public TDest[] MapToArray(IEnumerable<TSrc> src)
         {
-            TDest dest;
-            dest = (TDest)Activator.CreateInstance(typeof(TDest));
-            for (int i = 0, j = 0; i < srcProps.Length && j < destProps.Length; i++)
+            
+            TDest[] aux = new TDest[src.Count()];
+            int i = 0;
+            foreach (var s in src)
             {
-                if (srcProps[i].Name.Equals(destProps[j].Name))//TODO check if they are compatible
-                {
-                    object aux = srcProps[i].GetValue(src);
-                    destProps[j].SetValue(dest, aux);
-                    j++;
-                }
+                aux[i] = Map(s);
+                i++;
             }
-            return dest;
+            return aux;
+
+        }
+
+        public IEnumerable<TDest> MapLazy(IEnumerable<TSrc> src)
+        {
+            foreach (var s in src)
+            {
+                yield return Map(s);
+            }
+        }
+
+        private bool IsCompatible(PropertyInfo src, PropertyInfo dest)
+        {
+            foreach (string str in ToBeIgnoredList)
+            {
+                if (!str.Equals(src.Name))
+                    return false;
+            }
+            return src.Name.Equals(dest.Name) && src.GetType() == dest.GetType();
         }
     }
 }

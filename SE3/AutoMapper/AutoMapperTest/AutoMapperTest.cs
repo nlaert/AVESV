@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AutoMapperPrj;
 using System.Collections.Generic;
+using AutoMapperTest.Model;
 
 namespace AutoMapperTest
 {
@@ -74,6 +75,16 @@ namespace AutoMapperTest
             Person p = m.Map(s);
             Assert.AreNotEqual(s.Name, p.Name);
             Assert.AreEqual(s.Nr, p.Nr);
+        }
+
+        [TestMethod]
+        public void ForMemberTest()
+        {
+            Mapper<Student, User> m = Builder.Build<Student, User>().ForMember("Id", src => src.Nr.ToString()).CreateMapper();
+            Student s = new Student { Nr = 27721, Name = "Ze Manel" };
+            User p = m.Map(s);
+            Assert.AreNotEqual(s.Name, p.Name);
+            Assert.AreEqual(s.Nr.ToString(), p.Id);
         }
     }
 }

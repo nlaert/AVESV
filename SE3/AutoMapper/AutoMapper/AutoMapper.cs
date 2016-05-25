@@ -18,12 +18,14 @@ namespace AutoMapperPrj
 
     public class AutoMapper<TSrc, TDest> : Mapper<TSrc, TDest>
     {
-        public Dictionary<PropertyInfo, PropertyInfo> PropertiesDictionary { get; set; }
-        public List<string> NamesToBeIgnored;
-        public List<Type> AttributesToBeIgnored;
+        private Dictionary<PropertyInfo, PropertyInfo> PropertiesDictionary;
+        private Dictionary<string, Func<TSrc, object>> ForMemberDictionary;
+        private List<string> NamesToBeIgnored;
+        private List<Type> AttributesToBeIgnored;
         public AutoMapper()
         {
             PropertiesDictionary = new Dictionary<PropertyInfo, PropertyInfo>();
+            ForMemberDictionary = new Dictionary<string, Func<TSrc, object>>();
             NamesToBeIgnored = new List<string>();
             AttributesToBeIgnored = new List<Type>();
         }
@@ -40,8 +42,13 @@ namespace AutoMapperPrj
             AttributesToBeIgnored.Add(t);
             return this;
         }
-        
 
+        public AutoMapper<TSrc, TDest> ForMember(string name, Func<TSrc, object> func)
+        {
+            ForMemberDictionary.Add(name, func);
+            return this;
+        }
+        
         public Mapper<TSrc, TDest> CreateMapper()
         {
             Type srcType = typeof(TSrc);
@@ -66,11 +73,10 @@ namespace AutoMapperPrj
             PropertyInfo[] props = PropertiesDictionary.Keys.ToArray();
             foreach (PropertyInfo p in props)
             {
-                object aux = p.GetValue(src);
+                object aux = GetValue(p, src);
                 PropertiesDictionary[p].SetValue(dest, aux);
             }
             return dest;
-            
         }
 
         public TColDest Map<TColDest>(IEnumerable<TSrc> src) where TColDest : ICollection<TDest>
@@ -86,7 +92,6 @@ namespace AutoMapperPrj
 
         public TDest[] MapToArray(IEnumerable<TSrc> src)
         {
-            
             TDest[] aux = new TDest[src.Count()];
             int i = 0;
             foreach (var s in src)
@@ -95,7 +100,6 @@ namespace AutoMapperPrj
                 i++;
             }
             return aux;
-
         }
 
         public IEnumerable<TDest> MapLazy(IEnumerable<TSrc> src)
@@ -108,8 +112,12 @@ namespace AutoMapperPrj
 
         private bool IsCompatible(PropertyInfo src, PropertyInfo dest, ref int j)
         {
-            if (!src.Name.Equals(dest.Name) || src.GetType() != dest.GetType())
+            if ((!src.Name.Equals(dest.Name) || src.GetType() != dest.GetType()) && 
+                !ForMemberDictionary.ContainsKey(dest.Name))
+            {
                 return false;
+            }
+                
             foreach (string str in NamesToBeIgnored)
             {
                 if (str.Equals(src.Name))
@@ -128,6 +136,17 @@ namespace AutoMapperPrj
                 }
             }
             return true;
+        }
+
+        private object GetValue(PropertyInfo property, TSrc src)
+        {
+            string destName = PropertiesDictionary[property].Name;
+            if (ForMemberDictionary.ContainsKey(destName))
+            {
+                Func<TSrc, object> func = ForMemberDictionary[destName];
+                return func(src);
+            }
+            return property.GetValue(src);
         }
     }
 }

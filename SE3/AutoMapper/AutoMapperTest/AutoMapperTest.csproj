@@ -53,6 +53,7 @@
     <Compile Include="AutoMapperTest.cs" />
     <Compile Include="MapperIgnoreAttribute.cs" />
     <Compile Include="Model\Person.cs" />
+    <Compile Include="Model\Professor2.cs" />
     <Compile Include="Model\Professor.cs" />
     <Compile Include="Model\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

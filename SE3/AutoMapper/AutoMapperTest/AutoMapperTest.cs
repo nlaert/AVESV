@@ -18,6 +18,33 @@ namespace AutoMapperTest
             Assert.AreEqual(s.Name, p.Name); 
             Assert.AreEqual(s.Nr, p.Nr);
         }
+
+        [TestMethod]
+        public void MapTestWithConstructorParameters()
+        {
+            Mapper<Student, Person> m = Builder.Build<Student, Person>().CreateMapper();
+            Student s = new Student { Nr = 27721, Name = "Ze Manel", prof = new Professor("Trindade",35392 ,"AVE") };
+            Person p = m.Map(s);
+            Assert.AreEqual(s.Name, p.Name);
+            Assert.AreEqual(s.Nr, p.Nr);
+            Assert.AreEqual(s.prof.Name , p.prof.Name);
+            Assert.AreEqual(s.prof.Nr, p.prof.Nr);
+            Assert.AreEqual(s.prof.Lesson, p.prof.Lesson);
+            Assert.IsNull(p.prof2);
+           
+        }
+
+        [TestMethod]
+        public void MapTestWithoutConstructorParameters()
+        {
+            Mapper<Student, Person> m = Builder.Build<Student, Person>().CreateMapper();
+            Student s = new Student { Nr = 27721, Name = "Ze Manel",  prof2 = new Professor2 { Name = "Trindade", Nr = 35392, Lesson = "AVE" } };
+            Person p = m.Map(s);
+            Assert.AreEqual(s.Name, p.Name);
+            Assert.AreEqual(s.Nr, p.Nr);
+            Assert.IsNull(p.prof2);
+        }
+
         [TestMethod]
         public void MapCollectionTest()
         {
@@ -71,9 +98,9 @@ namespace AutoMapperTest
         public void IgnoreAttributeTest()
         {
             Mapper<Professor, Person> m = Builder.Build<Professor, Person>().IgnoreMember<MapperIgnoreAttribute>().CreateMapper();
-            Professor s = new Professor { Nr = 27721, Name = "Ze Manel" };
+            Professor s = new Professor ("Ze Manel", 27721 , "AVE");
             Person p = m.Map(s);
-            Assert.AreNotEqual(s.Name, p.Name);
+            Assert.AreEqual(s.Name, p.Name);
             Assert.AreEqual(s.Nr, p.Nr);
         }
 

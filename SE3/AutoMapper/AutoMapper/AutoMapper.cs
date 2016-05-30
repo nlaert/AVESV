@@ -121,6 +121,15 @@ namespace AutoMapperPrj
             {
                 return false;
             }
+
+            Type propertyType = src.PropertyType;
+
+            if (propertyType != typeof(string) && !ValidCtorWithParameters(propertyType))
+            {
+                return false;
+
+            }
+
             foreach (string str in NamesToBeIgnored)
             {
                 if (str.Equals(src.Name))
@@ -139,6 +148,34 @@ namespace AutoMapperPrj
                 }
             }
             return true;
+        }
+
+        private bool ValidCtorWithParameters(Type src)
+        {
+
+            if (src == null)
+                return false;
+            
+            if (src.BaseType == typeof(object))
+            {
+                ConstructorInfo[] ctors = src.GetConstructors();
+                foreach( ConstructorInfo ctor in ctors)
+                {
+                    if (ctor.GetParameters().Length == 0)
+                        return false;
+                    /*
+                    foreach (var param in ctor.GetParameters())
+                    {
+                        Console.WriteLine(string.Format(
+                            "Param {0} is named {1} and is of type {2}",
+                            param.Position, param.Name, param.ParameterType));
+                    }
+                    */
+                }
+
+            }
+            return true;
+
         }
 
         private object GetValue(PropertyInfo property, TSrc src)

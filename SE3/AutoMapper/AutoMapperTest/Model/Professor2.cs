@@ -6,19 +6,12 @@ using System.Threading.Tasks;
 
 namespace AutoMapperTest
 {
-    public class Professor
+    public class Professor2
     {
         public string Name { get; set; }
         public int Nr { get; set; }
         public string Lesson { get; set; }
 
-        public Professor(string Name, int Nr, string Lesson)
-        {
-            this.Name = Name;
-            this.Nr = Nr;
-            this.Lesson = Lesson;
-        }
-       
 
     }
 }

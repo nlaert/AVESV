@@ -10,6 +10,8 @@ namespace AutoMapperTest
     {
         public string Name { get; set; } 
         public int Nr { get; set; }
+        public Professor prof { get; set; }
+        public Professor2 prof2 { get; set; }
 
         // override object.Equals
         public override bool Equals(object obj)
